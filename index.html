@@ -3,170 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denis | OS Portfolio</title>
+    <title>Denis | Mathematical Engineering</title>
     <style>
-        /* GENEL MASAÜSTÜ AYARLARI */
+        /* --- 1. GENEL AYARLAR VE MATRİX ARKA PLANI --- */
         body {
-            background-color: #008080; /* Klasik Windows Teal Rengi */
+            background-color: #0f0f0f;
+            background-image: 
+                linear-gradient(rgba(0, 255, 127, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 127, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
             margin: 0;
             padding: 0;
             font-family: 'Courier New', Courier, monospace;
-            overflow: hidden; /* Sayfa kaydırmayı engelle, sadece pencere */
+            overflow: hidden;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none; /* Metin seçimini engelle (masaüstü hissi için) */
         }
 
-        /* PENCERE TASARIMI (RETRO KUTU) */
+        /* --- 2. PENCERE TASARIMI (DRAGGABLE) --- */
         .window {
             width: 600px;
-            background-color: #c0c0c0; /* Gri Arka Plan */
+            max-width: 90%;
+            background-color: #c0c0c0;
             border-top: 2px solid #dfdfdf;
             border-left: 2px solid #dfdfdf;
             border-right: 2px solid #000;
             border-bottom: 2px solid #000;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-            position: absolute; /* Sürüklenebilir olması için */
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            position: absolute;
+            z-index: 10;
         }
 
-        /* PENCERE BAŞLIĞI (MAVİ ŞERİT) */
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
-            padding: 5px 8px;
+            padding: 4px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: move; /* Tutup sürükleme imleci */
+            cursor: grab;
         }
 
-        .title-text {
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
+        .title-bar:active { cursor: grabbing; }
 
-        .window-controls {
-            display: flex;
-            gap: 4px;
-        }
+        .title-text { color: white; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
+
+        .window-controls { display: flex; gap: 4px; }
 
         .btn {
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             background-color: #c0c0c0;
-            border-top: 1px solid #fff;
-            border-left: 1px solid #fff;
-            border-right: 1px solid #000;
-            border-bottom: 1px solid #000;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px outset #fff;
+            font-size: 10px; display: flex;
+            align-items: center; justify-content: center;
             cursor: pointer;
         }
+        .btn:active { border: 1px inset #fff; }
 
-        /* İÇERİK ALANI */
-        .window-body {
-            padding: 20px;
-            color: #000;
-        }
+        .window-body { padding: 20px; color: #000; user-select: text; }
 
-        h1 { font-size: 22px; margin-top: 0; text-transform: uppercase; border-bottom: 2px solid #808080; padding-bottom: 5px; }
+        h1 { font-size: 20px; margin-top: 0; border-bottom: 2px solid #808080; padding-bottom: 5px; }
         p { font-size: 14px; line-height: 1.5; }
         
-        .tag-container { margin-top: 15px; }
-        .tag { 
-            background: #fff; 
-            border: 1px solid #000; 
-            padding: 2px 6px; 
-            margin-right: 5px; 
-            font-size: 12px; 
-            font-weight: bold;
+        .tag { background: #fff; border: 1px solid #000; padding: 2px 6px; margin-right: 5px; font-size: 12px; font-weight: bold; }
+        a { color: blue; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* --- 3. BAŞLAT MENÜSÜ --- */
+        .start-menu {
+            display: none;
+            position: fixed;
+            bottom: 38px; left: 2px;
+            width: 200px;
+            background-color: #c0c0c0;
+            border: 2px outset #fff;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            z-index: 1000;
+            padding: 3px;
         }
 
-        ul { list-style-type: square; padding-left: 20px; }
+        .sidebar {
+            background: linear-gradient(180deg, #000080, #1084d0);
+            width: 25px; height: 96%;
+            position: absolute; left: 3px; top: 3px; bottom: 3px;
+            color: white; font-weight: bold;
+            writing-mode: vertical-rl; transform: rotate(180deg);
+            text-align: center; padding: 5px 0;
+            font-size: 18px;
+        }
+
+        .menu-items { margin-left: 32px; display: flex; flex-direction: column; }
         
-        /* TASKBAR (ALT ÇUBUK) */
+        .menu-item {
+            padding: 8px 10px; color: black; text-decoration: none;
+            font-size: 13px; cursor: pointer; display: block;
+        }
+        .menu-item:hover { background-color: #000080; color: white; }
+        
+        .divider { height: 1px; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 4px 0; }
+
+        /* --- 4. TASKBAR (GÖREV ÇUBUĞU) --- */
         .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; height: 35px;
             background-color: #c0c0c0;
             border-top: 2px solid #fff;
-            display: flex;
-            align-items: center;
-            padding-left: 5px;
-        }
-        .start-btn {
-            padding: 5px 15px;
-            font-weight: bold;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #000;
-            border-bottom: 2px solid #000;
-            background: #c0c0c0;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            display: flex; align-items: center;
+            padding: 0 4px; box-sizing: border-box;
+            z-index: 999;
         }
 
+        .start-btn {
+            padding: 4px 10px; font-weight: bold; font-size: 13px;
+            border: 2px outset #fff;
+            background: #c0c0c0;
+            display: flex; align-items: center; gap: 5px;
+            cursor: pointer;
+        }
+        
+        .start-btn.active { border: 2px inset #fff; background-color: #a0a0a0; }
+
+        .task-tab {
+            margin-left: 10px; padding: 4px 10px;
+            background: #e0e0e0; border: 2px inset #fff;
+            font-size: 12px; font-weight: bold;
+        }
+
+        .clock {
+            margin-left: auto; padding: 4px 10px;
+            border: 2px inset #fff; background: #c0c0c0;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="window" id="myWindow">
+    <div class="start-menu" id="startMenu">
+        <div class="sidebar">DenisOS 26</div>
+        <div class="menu-items">
+            <a href="https://github.com/denis-sokmener" target="_blank" class="menu-item">📁 GitHub Projects</a>
+            <a href="#" class="menu-item">📄 CV / Resume</a>
+            <a href="#" class="menu-item">🎮 TFT Stats</a>
+            <div class="divider"></div>
+            <a href="#" class="menu-item" onclick="location.reload()">🔄 Restart System</a>
+            <a href="#" class="menu-item" onclick="alert('System Shutdown...');">🔌 Shutdown</a>
+        </div>
+    </div>
+
+    <div class="window" id="myWindow" style="top: 20%; left: 20%;">
         <div class="title-bar" id="titleBar">
-            <span class="title-text">Denis_Portfolio.exe</span>
+            <span class="title-text">C:\Users\Denis\Portfolio.exe</span>
             <div class="window-controls">
                 <div class="btn">_</div>
-                <div class="btn">X</div>
+                <div class="btn" onclick="document.getElementById('myWindow').style.display='none'">X</div>
             </div>
         </div>
         <div class="window-body">
             <h1>Denis</h1>
             <p><strong>Mathematical Engineering Student</strong> <br> Yildiz Technical University (YTÜ)</p>
             
-            <p>Welcome to my digital workspace. I build software solutions bridging mathematics and engineering.</p>
+            <p>Welcome to my workspace. I specialize in bridging mathematical modeling with software efficiency.</p>
             
-            <hr style="border: 0; border-top: 1px dashed #000; margin: 15px 0;">
-
-            <strong>Skills & Interests:</strong>
-            <div class="tag-container">
+            <div style="margin: 15px 0;">
                 <span class="tag">C Programming</span>
                 <span class="tag">Data Analysis</span>
-                <span class="tag">Algorithms</span>
+                <span class="tag">TFT Analytics</span>
                 <span class="tag">GeoGuessr</span>
             </div>
 
             <ul>
-                <li><strong>Erasmus+:</strong> Experience in Koszalin, Poland.</li>
-                <li><strong>Focus:</strong> Developing statistical tools.</li>
+                <li><strong>Erasmus+:</strong> Completed mobility in Koszalin, Poland.</li>
+                <li><strong>Current Focus:</strong> Developing statistical tools for game theory and competitive gaming data.</li>
             </ul>
 
             <div style="margin-top: 20px; text-align: center;">
-                <a href="https://github.com/KULLANICIADIN" target="_blank" style="color: blue;">[ GitHub Profile ]</a>
+                <a href="https://github.com/denis-sokmener" target="_blank">[ View GitHub Profile ]</a>
             </div>
         </div>
     </div>
 
     <div class="taskbar">
-        <div class="start-btn">
-            <span style="font-style: italic; font-weight: 900;">Start</span>
+        <div class="start-btn" id="startBtn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Windows_logo_-_2012_%28dark_blue%29.svg/1024px-Windows_logo_-_2012_%28dark_blue%29.svg.png" width="14">
+            Start
         </div>
-        <div style="margin-left: 10px; padding: 5px 10px; background: #e0e0e0; border: 1px inset #fff;">
-            Denis_Portfolio.exe
-        </div>
+        <div class="task-tab">Portfolio.exe</div>
+        <div class="clock" id="clock">00:00</div>
     </div>
 
     <script>
-        // Pencereyi sürüklenebilir yapma kodu
+        // 1. SAAT GÜNCELLEME
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').innerText = `${hours}:${minutes}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 2. BAŞLAT MENÜSÜ MANTIĞI
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+
+        startBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Tıklamanın body'ye gitmesini engelle
+            const isVisible = startMenu.style.display === 'block';
+            startMenu.style.display = isVisible ? 'none' : 'block';
+            startBtn.classList.toggle('active', !isVisible);
+        });
+
+        // Boşluğa tıklayınca menüyü kapat
+        document.addEventListener('click', (e) => {
+            if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+                startMenu.style.display = 'none';
+                startBtn.classList.remove('active');
+            }
+        });
+
+        // 3. PENCERE SÜRÜKLEME MANTIĞI
         const windowElem = document.getElementById("myWindow");
         const titleBar = document.getElementById("titleBar");
-
+        
         let isDragging = false;
         let offsetX, offsetY;
 
@@ -174,11 +234,11 @@
             isDragging = true;
             offsetX = e.clientX - windowElem.offsetLeft;
             offsetY = e.clientY - windowElem.offsetTop;
-            windowElem.style.cursor = "grabbing";
         });
 
         document.addEventListener("mousemove", (e) => {
             if (isDragging) {
+                // Sadece ekran içinde kalması için basit kontrol eklenebilir
                 windowElem.style.left = `${e.clientX - offsetX}px`;
                 windowElem.style.top = `${e.clientY - offsetY}px`;
             }
@@ -186,7 +246,6 @@
 
         document.addEventListener("mouseup", () => {
             isDragging = false;
-            windowElem.style.cursor = "default";
         });
     </script>
 
