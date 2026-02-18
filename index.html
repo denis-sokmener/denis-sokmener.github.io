@@ -106,4 +106,89 @@
             font-weight: bold;
             border-top: 2px solid #fff;
             border-left: 2px solid #fff;
-            border-right: 2px solid #000
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            background: #c0c0c0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="window" id="myWindow">
+        <div class="title-bar" id="titleBar">
+            <span class="title-text">Denis_Portfolio.exe</span>
+            <div class="window-controls">
+                <div class="btn">_</div>
+                <div class="btn">X</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <h1>Denis</h1>
+            <p><strong>Mathematical Engineering Student</strong> <br> Yildiz Technical University (YTÜ)</p>
+            
+            <p>Welcome to my digital workspace. I build software solutions bridging mathematics and engineering.</p>
+            
+            <hr style="border: 0; border-top: 1px dashed #000; margin: 15px 0;">
+
+            <strong>Skills & Interests:</strong>
+            <div class="tag-container">
+                <span class="tag">C Programming</span>
+                <span class="tag">Data Analysis</span>
+                <span class="tag">Algorithms</span>
+                <span class="tag">GeoGuessr</span>
+            </div>
+
+            <ul>
+                <li><strong>Erasmus+:</strong> Experience in Koszalin, Poland.</li>
+                <li><strong>Focus:</strong> Developing statistical tools.</li>
+            </ul>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="https://github.com/KULLANICIADIN" target="_blank" style="color: blue;">[ GitHub Profile ]</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-btn">
+            <span style="font-style: italic; font-weight: 900;">Start</span>
+        </div>
+        <div style="margin-left: 10px; padding: 5px 10px; background: #e0e0e0; border: 1px inset #fff;">
+            Denis_Portfolio.exe
+        </div>
+    </div>
+
+    <script>
+        // Pencereyi sürüklenebilir yapma kodu
+        const windowElem = document.getElementById("myWindow");
+        const titleBar = document.getElementById("titleBar");
+
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        titleBar.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - windowElem.offsetLeft;
+            offsetY = e.clientY - windowElem.offsetTop;
+            windowElem.style.cursor = "grabbing";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (isDragging) {
+                windowElem.style.left = `${e.clientX - offsetX}px`;
+                windowElem.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            windowElem.style.cursor = "default";
+        });
+    </script>
+
+</body>
+</html>
